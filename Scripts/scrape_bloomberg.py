@@ -19,9 +19,6 @@ import sys, os, re, csv, datetime
 from bs4 import BeautifulSoup, NavigableString
 from urllib import urlopen
 
-# local libraries:
-import smart_plot as sp
-
 # remove whitespace of a string
 def strip1(str):
     if "Yr Return" in str:
@@ -71,25 +68,16 @@ def parse_html_bloomberg(html, csvname):
     csv_file.close()
 
 
-def main(argv):
+def collect_stockdata(watch_list, dirname):
+    
     # some path constants.
-    dirname = './Bloomberg/'
+
     if not os.path.exists(dirname):
         os.makedirs(dirname)
 
-    # add more stocks to watch in here. 
-    bloomberg_watch_list = {  'facebook'    : 'FB:US',
-                              'capitalone'  : 'COF:US',
-                              'apple'       : 'AAPL:US',
-                              'tesaro'      : 'TSRO:US',
-                              'tesla'       : 'TSLA:US',
-                              'pfizer'      : 'PFE:US',
-                              'alibaba'     : 'BABA:US'
-                           }
-        
     csvfiles = []
     comnames = []
-    for name, code in bloomberg_watch_list.items():
+    for name, code in watch_list.items():
         print '#-------------# grep '+name+' stock data ... #-------------#'
         html = urlopen('http://www.bloomberg.com/quote/'+code).read()
         csvname = dirname+name+'.csv'
@@ -97,15 +85,9 @@ def main(argv):
         csvfiles.append(csvname)
         comnames.append(name)
 
-    sp.smart_plot(csvfiles, comnames, 3)
-
     buy = 1
     sell= 1
     if buy or sell:
         os.system("mail -s 'From mc2:PriceWatch' xzhang11@stanford.edu < /dev/null")
 
-    print ("... normal end of program")
-    exit(0)
-    
-if __name__ == "__main__":
-    main(sys.argv[1:])
+    return 0

@@ -10,6 +10,10 @@ from itertools import islice
 from subprocess import call
 from pylab import *
 import time   
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+
 
 #
 # ----------------------------------------------------------------------------
@@ -152,23 +156,67 @@ def time_to_float(datetime):
 #
 # ----------------------------------------------------------------------------
 #
-def smart_plot(csvfiles, companynames,plt_index):
+def stock_plot(watch_list, dirname, stock_dir):
    
    set_printoptions(threshold='nan')
    plot_start()
    fig = plt.figure()
 
-   for csvfile in csvfiles:
+   for csvfile in watch_list.keys():
       valarr = np.zeros((0,2))
-      reader = csv.reader(open(csvfile),delimiter = ' ', quotechar='|')
+      reader = csv.reader(open(stock_dir+csvfile+'.csv'),delimiter = ' ', quotechar='|')
       for datetime, open_amount, day_min, day_max, prev_close, min_52w, max_52w, return_1yr, return_ytd in reader:
           valarr = np.vstack([valarr, [time_to_float(datetime), day_max]])
 
       plt.plot( valarr[:,0], valarr[:,1], '-o', linewidth=3.0)
-      legend(companynames,loc=2)
+      legend(watch_list.keys(),loc=2)
        
    plot_finish(-1)
 
    return 0
+
+
+def twitter_hist(watch_list, dirname, twitter_dir):
+
+    tweets_data_path = twitter_dir+'twitter_data.txt'
+    tweets_data = []
+    tweets_file = open(tweets_data_path, "r")
+    for line in tweets_file:
+        try:
+            tweet = json.loads(line)
+            tweets_data.append(tweet)
+        except:
+            continue
+
+    print len(tweets_data)
+
+    tweets = pd.DataFrame()
+
+    tweets['facebook'] = tweets['text'].apply(lambda tweet: word_in_text('facebook', tweet))
+    tweets['capitalone'] = tweets['text'].apply(lambda tweet: word_in_text('capitalone', tweet))
+    tweets['apple'] = tweets['text'].apply(lambda tweet: word_in_text('apple', tweet))
+    tweets['tesla'] = tweets['text'].apply(lambda tweet: word_in_text('tesla', tweet))
+
+    print tweets['facebook'].value_counts()[True]
+    print tweets['capitalone'].value_counts()[True]
+    print tweets['apple'].value_counts()[True]
+    print tweets['tesla'].value_counts()[True]
+
+    prg_langs = ['facebook', 'capitalone', 'apple','tesla']
+    tweets_by_prg_lang = [tweets['facebook'].value_counts()[True], tweets['capitalone'].value_counts()[True], tweets['apple'].value_counts()[True],  tweets['tesla'].value_counts()[True]]
+    
+    x_pos = list(range(len(prg_langs)))
+    width = 0.8
+    fig, ax = plt.subplots()
+    plt.bar(x_pos, tweets_by_prg_lang, width, alpha=1, color='g')
+    ax.set_ylabel('Number of tweets', fontsize=15)
+    ax.set_title('News: facebook vs. capitalone vs. apple vs. tesla', fontsize=10, fontweight='bold')
+    ax.set_xticks([p + 0.4 * width for p in x_pos])
+    ax.set_xticklabels(prg_langs)
+    plt.grid()
+
+    plt.savefig( dirname+'bar-companies-mentioned.pdf', transparent=True)
+
+    return 0
 
    
