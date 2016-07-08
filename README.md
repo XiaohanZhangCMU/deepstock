@@ -1,5 +1,5 @@
 *****************************************************************
-                      DeepStock: 
+                      About DeepStock functionals: 
 *****************************************************************
 
 * Scrape tweets and stock data about companies in watch_list.
@@ -21,7 +21,7 @@ Python package Dependency:
 4) tweepy
 
 *****************************************************************
-                      Run: 
+                      Run DeepStock on mac/linux: 
 *****************************************************************
 
 Interactive or automatically every 7 hrs on a server.
