@@ -28,6 +28,9 @@ Interactive or automatically every 7 hrs on a server.
 cd Scripts && python exec.py
 crontab -e  ' */420 * * * * ~/DeepStock/autorun.sh '
 
+stock data from bloomberg and tweet rumors are stored in 
+Twitter/ and Bloomberg/
+
 *****************************************************************
                       Contribution guides:
 *****************************************************************
