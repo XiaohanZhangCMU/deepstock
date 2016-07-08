@@ -11,14 +11,15 @@
 *****************************************************************
 
 easy_install --prefix=/home/xzhang11/usr/ beautifulsoup4-4.4.1
+easy_install --prefix=/home/xzhang11/usr/ oauth2
+easy_install --prefix=/home/xzhang11/usr/ tweepy
+easy_install --prefix=/home/xzhang11/usr/ pandas
+
 export PYTHONPATH=
 $PYTHONPATH:/home/xzhang11/usr//lib/python2.7/site-packages
 
-Python package Dependency:
+Other python package dependency:
 1) numpy, scipy, matplotlib
-2) pandas
-3) beautifulsoup
-4) tweepy
 
 *****************************************************************
                       Run DeepStock on mac/linux: 
