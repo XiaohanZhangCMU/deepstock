@@ -25,7 +25,7 @@ class StdOutListener(StreamListener):
     def on_error(self, status):
         print status
 
-def collect_rumors(watch_list, dirname):
+def collect_rumors(watch_list,lprd, dirname):
 
     #Bookeeping login
     api_key = "GmNUk9I4KcmwllvLrAXd1jc3G"
@@ -47,7 +47,7 @@ def collect_rumors(watch_list, dirname):
     timestamp = str(datetime.datetime.now().year) +'-'+str(datetime.datetime.now().month)+ '-'+ str(datetime.datetime.now().day) +'-'+str(datetime.datetime.now().hour)+ '-'+ str(datetime.datetime.now().minute)
 
     f = open(dirname+timestamp+'-twitter_data'+'.txt','aw')
-    l = StdOutListener(f, time.time()+10)
+    l = StdOutListener(f, time.time()+lprd)
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token_key, access_token_secret)
     stream = Stream(auth, l)

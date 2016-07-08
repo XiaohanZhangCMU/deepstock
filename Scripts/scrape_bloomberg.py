@@ -78,7 +78,7 @@ def collect_stockdata(watch_list, dirname):
     csvfiles = []
     comnames = []
     for name, code in watch_list.items():
-        print '#-------------# grep '+name+' stock data ... #-------------#'
+        print ' grep '+name+' stock data ...'
         html = urlopen('http://www.bloomberg.com/quote/'+code).read()
         csvname = dirname+name+'.csv'
         parse_html_bloomberg( html, csvname )

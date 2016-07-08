@@ -50,7 +50,7 @@ def plot_set_up( type ):
 #upper center 9
 
    params = {'legend.fontsize': 12,
-             'legend.linewidth': 0.75,
+#             'legend.linewidth': 0.75,
              'legend.frameon': True,
              'legend.numpoints': 1,
              'figure.figsize': (paper_width,paper_height),
@@ -152,42 +152,48 @@ def word_in_text(word, text):
 
 def twitter_hist(watch_list, dirname, twitter_dir):
 
-    tweets_data_path = twitter_dir+'twitter_data.txt'
-    tweets_data = []
-    tweets_file = open(tweets_data_path, "r")
-    for line in tweets_file:
-       if 'created_at' in line:
-          try:
-             tweet = json.loads(line)
-             tweets_data.append(tweet)
-          except:
-             continue
+    workdir = os.getcwd()
+    os.chdir(twitter_dir)
+    fileList = glob('*.txt')
+    os.chdir(workdir)
 
-    print len(tweets_data)
+    for tf in fileList:       
+       tweets_data_path = twitter_dir + tf
+       tweets_data = []    
+       tweets_file = open(tweets_data_path, "r")
+       for line in tweets_file:
+          print line
+          if 'created_at' in line:
+             try:
+                tweet = json.loads(line)
+                tweets_data.append(tweet)
+             except:
+                continue
 
-    tweets = pd.DataFrame()
+       print len(tweets_data)
 
-    tweets['text'] = map(lambda tweet: tweet['text'], tweets_data)
+       tweets = pd.DataFrame()
+       tweets['text'] = map(lambda tweet: tweet['text'], tweets_data)
 
-    prg_keys = []    
-    for name in watch_list.keys():
-       tweets[name] = tweets['text'].apply(lambda tweet: word_in_text(name,tweet))
-       if True not in tweets[name].value_counts().keys():
-          prg_keys.append(0)
-       else:
-          prg_keys.append(tweets[name].value_counts()[True])
+       prg_keys = []    
+       for name in watch_list.keys():
+          tweets[name] = tweets['text'].apply(lambda tweet: word_in_text(name,tweet))
+          if True not in tweets[name].value_counts().keys():
+             prg_keys.append(0)
+          else:
+             prg_keys.append(tweets[name].value_counts()[True])
 
-    x_pos = list(range(len(prg_keys)))
-    width = 0.8
-    fig, ax = plt.subplots()
-    plt.bar(x_pos, prg_keys, width, alpha=1, color='g')
-    ax.set_ylabel('Number of tweets', fontsize=15)
-    ax.set_title('Rumor bars by company', fontsize=10, fontweight='bold')
-    ax.set_xticks([p + 0.4 * width for p in x_pos])
-    ax.set_xticklabels(watch_list.keys())
-    plt.grid()
+       x_pos = list(range(len(prg_keys)))
+       width = 0.8
+       fig, ax = plt.subplots()
+       plt.bar(x_pos, prg_keys, width, alpha=1, color='g')
+       ax.set_ylabel('Number of tweets', fontsize=15)
+       ax.set_title('Rumor bars by company', fontsize=10, fontweight='bold')
+       ax.set_xticks([p + 0.4 * width for p in x_pos])
+       ax.set_xticklabels(watch_list.keys())
+       plt.grid()
 
-    plt.savefig( dirname+'bar-companies-mentioned.pdf', transparent=True)
+       plt.savefig( dirname+'bar'+tf+'.pdf', transparent=True)
 
     return 0
 
