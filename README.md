@@ -13,7 +13,7 @@
 easy_install --prefix=/home/xzhang11/usr/ beautifulsoup4-4.4.1
 easy_install --prefix=/home/xzhang11/usr/ oauth2
 easy_install --prefix=/home/xzhang11/usr/ tweepy
-easy_install --prefix=/home/xzhang11/usr/ pandas
+easy_install --prefix=/home/xzhang11/usr/ pandas (takes 5 mins)
 
 export PYTHONPATH=
 $PYTHONPATH:/home/xzhang11/usr//lib/python2.7/site-packages
