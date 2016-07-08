@@ -29,6 +29,7 @@ Interactive or automatically every 7 hrs on a server.
 cd Scripts && python exec.py
 crontab -e  ' */420 * * * * ~/DeepStock/autorun.sh '
 
+modify lprd in Scripts/exec.py to change how long twitter listens
 stock data from bloomberg and tweet rumors are stored in 
 Twitter/ and Bloomberg/
 
