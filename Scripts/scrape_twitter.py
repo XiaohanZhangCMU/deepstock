@@ -1,37 +1,33 @@
 import oauth2 as oauth
 import urllib2 as urllib
+import time, re, os, datetime
 from bs4 import BeautifulSoup, NavigableString
 from urllib import urlopen
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
-import re
-import os
 
 #This is a basic listener that just prints received tweets to stdout.
 class StdOutListener(StreamListener):
 
-    def __init__(self, twitter_file):
+    def __init__(self, twitter_file, stopTime):
         self.ofile = twitter_file
+        self.stopTime = stopTime
 
     def on_data(self, data):
-        self.ofile.write(data)
-        return True
+        if time.time() < self.stopTime:
+#            print 'time = ', time.time(), ' stpTime = ', self.stopTime
+            self.ofile.write(data)
+            return True
+        else:
+            return False
 
     def on_error(self, status):
         print status
 
-def word_in_text(word, text):
-    word = word.lower()
-    text = text.lower()
-    match = re.search(word, text)
-    if match:
-        return True
-    return False
-
-
 def collect_rumors(watch_list, dirname):
 
+    #Bookeeping login
     api_key = "GmNUk9I4KcmwllvLrAXd1jc3G"
     api_secret = "sDa9gnHXIbTbm1SJYprb1idXYSBrl69PY7mcIUGGmXhe5zMkAz"
     access_token_key = "155909132-c1yQfOMpC85AEBEnUCzGh6bgxbwHEOYSYCrTl59Q"
@@ -47,16 +43,17 @@ def collect_rumors(watch_list, dirname):
     https_handler = urllib.HTTPSHandler(debuglevel=_debug)
 
     #This handles Twitter authetification and the connection to Twitter Streaming API
+    #print 'datetime.datetime.year' , datetime.datetime.year
+    timestamp = str(datetime.datetime.now().year) +'-'+str(datetime.datetime.now().month)+ '-'+ str(datetime.datetime.now().day) +'-'+str(datetime.datetime.now().hour)+ '-'+ str(datetime.datetime.now().minute)
 
-    f = open(dirname+'twitter_data.txt','aw')
-    l = StdOutListener(f)
+    f = open(dirname+timestamp+'-twitter_data'+'.txt','aw')
+    l = StdOutListener(f, time.time()+10)
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token_key, access_token_secret)
     stream = Stream(auth, l)
 
-    #This line filter Twitter Streams to capture data by the keywords: 'python', 'javascript', 'ruby'
     keywords= watch_list.keys()
-#    stream.filter(track=['facebook', 'capitalone', 'apple', 'tesla'])
-    stream.filter(track=keywords, async=True)
-    
-    
+    stream.filter(track=keywords)#, async=True)
+    stream.disconnect()
+    print 'exiting scrape_twitter'
+    return 0

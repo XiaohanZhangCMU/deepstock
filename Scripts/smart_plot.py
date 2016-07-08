@@ -4,12 +4,12 @@ from glob import *
 import matplotlib
 matplotlib.use("PDF")  # non-interactive plot making
 import matplotlib.pyplot as plt
-import os, csv
-import sys, getopt
+import os, csv, re
+import getopt
 from itertools import islice
 from subprocess import call
 from pylab import *
-import time   
+import time
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -100,45 +100,8 @@ def plot_start():
 #   
    return
 
-#
-# ----------------------------------------------------------------------------
-#
-#    plot_finish
-#
-# ----------------------------------------------------------------------------
-#
-def plot_finish(data_index):
 
-   plt.annotate(' ',xy=(0.02, 0.92), xycoords='axes fraction')
-   plt.grid(True)
-   
-   plot_file_name = 'stock-watch.pdf'
-   print 'plt_file_name = ', plot_file_name
-
-   if os.path.isfile( plot_file_name ):
-      os.remove( plot_file_name )
-   plt.savefig( plot_file_name, transparent=True)
-
-   open = 0
-   if open == 1:
-      err = os.system("which acroread")
-      pdfcmmd = 'acroread '
-      if err != 0:
-         err = os.system("which open")
-         pdfcmmd = 'open '
-         if err != 0:
-            print 'Install acroread or evince to open result plot.'
-            exit(0)
-         
-#      os.system(pdfcmmd + plot_file_name)
-
-#   fileList = glob('*.pdf')
-#   for f in fileList:
-#      system('pdftops -eps {0}'.format(f))
-
-   return
-#
-
+# To-do: Remove this by using pandas time series. 
 def time_to_float(datetime):
 
    year = int(datetime.split(' ')[0].split('-')[0])
@@ -170,10 +133,21 @@ def stock_plot(watch_list, dirname, stock_dir):
 
       plt.plot( valarr[:,0], valarr[:,1], '-o', linewidth=3.0)
       legend(watch_list.keys(),loc=2)
-       
-   plot_finish(-1)
+
+   plt.annotate(' ',xy=(0.02, 0.92), xycoords='axes fraction')
+   plt.grid(True)
+   plt.savefig( dirname+'stock-watch.pdf', transparent=True)          
 
    return 0
+
+
+def word_in_text(word, text):
+    word = word.lower()
+    text = text.lower()
+    match = re.search(word, text)
+    if match:
+        return True
+    return False
 
 
 def twitter_hist(watch_list, dirname, twitter_dir):
@@ -182,37 +156,35 @@ def twitter_hist(watch_list, dirname, twitter_dir):
     tweets_data = []
     tweets_file = open(tweets_data_path, "r")
     for line in tweets_file:
-        try:
-            tweet = json.loads(line)
-            tweets_data.append(tweet)
-        except:
-            continue
+       if 'created_at' in line:
+          try:
+             tweet = json.loads(line)
+             tweets_data.append(tweet)
+          except:
+             continue
 
     print len(tweets_data)
 
     tweets = pd.DataFrame()
 
-    tweets['facebook'] = tweets['text'].apply(lambda tweet: word_in_text('facebook', tweet))
-    tweets['capitalone'] = tweets['text'].apply(lambda tweet: word_in_text('capitalone', tweet))
-    tweets['apple'] = tweets['text'].apply(lambda tweet: word_in_text('apple', tweet))
-    tweets['tesla'] = tweets['text'].apply(lambda tweet: word_in_text('tesla', tweet))
+    tweets['text'] = map(lambda tweet: tweet['text'], tweets_data)
 
-    print tweets['facebook'].value_counts()[True]
-    print tweets['capitalone'].value_counts()[True]
-    print tweets['apple'].value_counts()[True]
-    print tweets['tesla'].value_counts()[True]
+    prg_keys = []    
+    for name in watch_list.keys():
+       tweets[name] = tweets['text'].apply(lambda tweet: word_in_text(name,tweet))
+       if True not in tweets[name].value_counts().keys():
+          prg_keys.append(0)
+       else:
+          prg_keys.append(tweets[name].value_counts()[True])
 
-    prg_langs = ['facebook', 'capitalone', 'apple','tesla']
-    tweets_by_prg_lang = [tweets['facebook'].value_counts()[True], tweets['capitalone'].value_counts()[True], tweets['apple'].value_counts()[True],  tweets['tesla'].value_counts()[True]]
-    
-    x_pos = list(range(len(prg_langs)))
+    x_pos = list(range(len(prg_keys)))
     width = 0.8
     fig, ax = plt.subplots()
-    plt.bar(x_pos, tweets_by_prg_lang, width, alpha=1, color='g')
+    plt.bar(x_pos, prg_keys, width, alpha=1, color='g')
     ax.set_ylabel('Number of tweets', fontsize=15)
-    ax.set_title('News: facebook vs. capitalone vs. apple vs. tesla', fontsize=10, fontweight='bold')
+    ax.set_title('Rumor bars by company', fontsize=10, fontweight='bold')
     ax.set_xticks([p + 0.4 * width for p in x_pos])
-    ax.set_xticklabels(prg_langs)
+    ax.set_xticklabels(watch_list.keys())
     plt.grid()
 
     plt.savefig( dirname+'bar-companies-mentioned.pdf', transparent=True)

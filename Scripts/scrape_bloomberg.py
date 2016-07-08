@@ -15,7 +15,7 @@
 # Add statistics predictions. 
 # 
 
-import sys, os, re, csv, datetime
+import os, csv, datetime
 from bs4 import BeautifulSoup, NavigableString
 from urllib import urlopen
 
