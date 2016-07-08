@@ -162,7 +162,6 @@ def twitter_hist(watch_list, dirname, twitter_dir):
        tweets_data = []    
        tweets_file = open(tweets_data_path, "r")
        for line in tweets_file:
-          print line
           if 'created_at' in line:
              try:
                 tweet = json.loads(line)
