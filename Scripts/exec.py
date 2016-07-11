@@ -24,7 +24,7 @@ if __name__ == "__main__":
             commands.getstatusoutput('mkdir '+dir)
 
     # lprd := duration twitter being listened to in [Seconds]
-    lprd = 20
+    lprd = 1200
 
     blmbg.collect_stockdata (watch_list, dirs[0])    
     twttr.collect_rumors (watch_list, lprd, dirs[1])    
