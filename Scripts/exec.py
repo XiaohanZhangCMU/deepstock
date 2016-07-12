@@ -16,6 +16,7 @@ if __name__ == "__main__":
                     'tesla'       : 'TSLA:US',
                     'pfizer'      : 'PFE:US',
                     'alibaba'     : 'BABA:US'
+                    'nintendo'    : '7974:JP'
                  }
         
     dirs = ['../Bloomberg/', '../Twitter/', '../Graphics/']
